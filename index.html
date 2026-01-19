@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bodega Stock</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- PapaParse for Excel reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Punto de Venta</h1>
+        </header>
+
+        <div class="summary-panel">
+            <h2>Total Vendido Hoy</h2>
+            <div class="total-amount" id="totalVentas">S/ 0.00</div>
+        </div>
+
+        <main>
+            <div class="search-container">
+                <input type="text" id="buscador" placeholder="Buscar producto para vender..." autocomplete="off">
+                <div class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="resultado" class="results-container">
+                <!-- Resultados aparecerán aquí -->
+            </div>
+
+            <div id="ticket" class="ticket-container" style="display: none;">
+                <div class="ticket-header">
+                    <h3>Ticket Actual</h3>
+                    <span id="ticketTotal">Total: S/ 0.00</span>
+                </div>
+                <ul id="ticketList" class="ticket-list">
+                    <!-- Items del carrito -->
+                </ul>
+                <button id="finalizeSale" class="btn-primary btn-large">Finalizar Venta (Cobrar)</button>
+            </div>
+
+            <div class="sales-log-container">
+                <h3>Registro de Ventas</h3>
+                <div class="table-wrapper">
+                    <table class="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Total</th>
+                                <th>Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesLogBody">
+                            <!-- Logs go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Venta -->
+    <div id="saleModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modalProductName">Producto</h2>
+            <p class="modal-stock">Stock actual: <span id="modalStockValue">0</span> <span id="modalUnit"></span></p>
+
+            <div class="input-group">
+                <label for="saleQuantity">Cantidad a vender:</label>
+                <input type="number" id="saleQuantity" min="0" step="any" placeholder="0.00">
+            </div>
+
+            <div class="modal-actions">
+                <button id="cancelSale" class="btn-secondary">Cancelar</button>
+                <button id="confirmSale" class="btn-primary">Confirmar Venta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
