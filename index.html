@@ -15,6 +15,16 @@
 </head>
 
 <body>
+    <!-- Secure Overlay (Forced) -->
+    <div id="secure-overlay">
+        <div class="secure-box">
+            <h2 style="color: #00ff41; margin-bottom: 20px;">🔒 ACCESO RESTRINGIDO</h2>
+            <input type="password" id="pin-input" placeholder="PIN" maxlength="4">
+            <button onclick="verificarPin()">DESBLOQUEAR</button>
+            <p id="error-msg">Acceso Denegado</p>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>Punto de Venta</h1>

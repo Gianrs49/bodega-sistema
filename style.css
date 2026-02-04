@@ -258,16 +258,7 @@ input#buscador:focus {
 
 
 /* Sales Log */
-.sales-log-container {
-    margin-top: 1rem;
-}
-
-.sales-log-container h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    color: var(--text-primary);
-}
+.sales-log-container {}
 
 .table-wrapper {
     overflow-x: auto;
@@ -340,6 +331,71 @@ input#buscador:focus {
 .modal-overlay[style*="display: block"] .modal-content,
 .modal-overlay[style*="display: flex"] .modal-content {
     transform: scale(1);
+}
+
+/* FORZAR PANTALLA COMPLETA */
+#secure-overlay {
+    position: fixed !important;
+    /* Vital para que flote */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: #000000 !important;
+    /* Negro sólido */
+    z-index: 999999 !important;
+    /* Encima de todo */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* CAJA DEL LOGIN */
+.secure-box {
+    background: #111;
+    padding: 40px;
+    border: 2px solid #00ff41;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
+}
+
+/* INPUT Y BOTÓN */
+#pin-input {
+    font-size: 24px;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 20px;
+    letter-spacing: 10px;
+    width: 100%;
+    background: #222;
+    color: white;
+    border: 1px solid #555;
+    outline: none;
+}
+
+.secure-box button {
+    background: #00ff41;
+    color: black;
+    font-weight: bold;
+    padding: 15px 30px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.secure-box button:hover {
+    background: #00cc33;
+    box-shadow: 0 0 10px #00ff41;
+}
+
+#error-msg {
+    color: red;
+    display: none;
+    margin-top: 15px;
+    font-weight: bold;
 }
 
 .modal-content h2 {

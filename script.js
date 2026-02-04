@@ -1,4 +1,68 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- URLs ---
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTXankf6y-mM8geqPo9FiHMGBjoyTOpwdDgCb4yuYdJcKuUcRE6Ajgj2BIT1dPHzDpnNBJiR7nKgAKA/pub?output=csv';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzmVGri_eeFFsZPPQ1EljkI6u_o3GprN9ApygWXJ52wznxofOIvrDwgIdV8BiXSL3Mr-w/exec';
+
+    // ---------------------------------------------------------
+    // 1. NUEVA LÓGICA DE LOGIN (Reemplazo solicitado)
+    // ---------------------------------------------------------
+
+    // Referencias a los elementos (Usamos los IDs reales del HTML: secure-overlay y pin-input)
+    const overlay = document.getElementById('secure-overlay');
+    const input = document.getElementById('pin-input');
+
+    // Buscamos el botón dentro del overlay
+    const btn = overlay.querySelector('button');
+
+    // Función para intentar desbloquear
+    function intentarIngresar() {
+        if (input.value === "1234") {
+            // Si es correcto, desvanecer y quitar
+            overlay.style.transition = "opacity 0.5s";
+            overlay.style.opacity = "0";
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+                // INICIAR EL SISTEMA POS (Cargar datos)
+                console.log('Login correcto. Iniciando POS...');
+                loadData();
+            }, 500);
+        } else {
+            // Si es incorrecto
+            alert("⚠️ PIN INCORRECTO");
+            input.value = ""; // Borrar
+            input.focus();    // Volver a poner el cursor
+        }
+    }
+
+    // Evento: Click en el botón
+    if (btn) {
+        btn.onclick = function (e) {
+            // Evitamos que el onclick inline del HTML estorbe
+            e.preventDefault();
+            intentarIngresar();
+        };
+    }
+
+    // Evento: Tecla Enter en el input
+    if (input) {
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                intentarIngresar();
+            }
+        });
+        // Poner el cursor listo
+        input.focus();
+    }
+
+    // Compatibilidad con onclick="verificarPin()" del HTML (por seguridad)
+    window.verificarPin = intentarIngresar;
+
+
+    // ---------------------------------------------------------
+    // 2. LÓGICA DEL SISTEMA POS (Preservada)
+    // ---------------------------------------------------------
+
     // --- DOM Elements ---
     const searchInput = document.getElementById('buscador');
     const resultsContainer = document.getElementById('resultado');
@@ -20,10 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmSaleBtn = document.getElementById('confirmSale');
     const cancelSaleBtn = document.getElementById('cancelSale');
 
-    // URLs
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTXankf6y-mM8geqPo9FiHMGBjoyTOpwdDgCb4yuYdJcKuUcRE6Ajgj2BIT1dPHzDpnNBJiR7nKgAKA/pub?output=csv';
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzmVGri_eeFFsZPPQ1EljkI6u_o3GprN9ApygWXJ52wznxofOIvrDwgIdV8BiXSL3Mr-w/exec';
-
     // --- State ---
     let products = [];
     let cart = []; // Array of pending items
@@ -32,37 +92,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentProductId = null;
 
-    // --- Initialization ---
-    init();
+    // Inicializar listeners del POS
+    initPosListeners();
 
-    function init() {
-        console.log('Bodega POS System initializing (Cart Mode)...');
+    function initPosListeners() {
         // Update Modal Button Text
-        confirmSaleBtn.textContent = 'Agregar al Ticket';
+        if (confirmSaleBtn) confirmSaleBtn.textContent = 'Agregar al Ticket';
 
-        loadData();
-        setupEventListeners();
-    }
-
-    function setupEventListeners() {
         // Search
-        searchInput.addEventListener('input', handleSearch);
+        if (searchInput) searchInput.addEventListener('input', handleSearch);
 
         // Product Click (Delegation)
-        resultsContainer.addEventListener('click', handleProductClick);
+        if (resultsContainer) resultsContainer.addEventListener('click', handleProductClick);
 
         // Modal Actions
-        cancelSaleBtn.addEventListener('click', closeModal);
-        confirmSaleBtn.addEventListener('click', addToCart); // Changed from processSale
+        if (cancelSaleBtn) cancelSaleBtn.addEventListener('click', closeModal);
+        if (confirmSaleBtn) confirmSaleBtn.addEventListener('click', addToCart);
 
         // Ticket Actions
-        finalizeSaleBtn.addEventListener('click', finalizeSale);
+        if (finalizeSaleBtn) finalizeSaleBtn.addEventListener('click', finalizeSale);
 
         // Modal UX
-        saleModal.addEventListener('click', (e) => {
+        if (saleModal) saleModal.addEventListener('click', (e) => {
             if (e.target === saleModal) closeModal();
         });
-        saleQuantityInput.addEventListener('keypress', (e) => {
+        if (saleQuantityInput) saleQuantityInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addToCart();
         });
     }
@@ -78,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Data Loading ---
     function loadData() {
+        if (!resultsContainer) return;
         resultsContainer.innerHTML = '<div class="loading">Cargando inventario...</div>';
 
         Papa.parse(CSV_URL, {
@@ -89,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     products = results.data.map((item, index) => normalizeProduct(item, index));
                     console.log('Productos cargados:', products.length);
                     resultsContainer.innerHTML = '';
+                    // Opcional: Mostrar algunos productos al inicio
                 } else {
                     resultsContainer.innerHTML = '<div class="loading" style="color: #ef4444;">Error: Inventario vacío.</div>';
                 }
@@ -269,9 +325,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Process all items
-            // We'll map them to fetch promises
             const promises = cart.map(item => {
                 const saleData = {
+                    action: 'venta', // IMPORTANTE: Indicar acción de venta
                     producto: item.product.nombre,
                     cantidad: item.qty,
                     total: item.subtotal
@@ -279,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 return fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'no-cors', // Aquí SÍ usamos no-cors porque no esperamos respuesta JSON compleja para seguir
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(saleData)
                 });
