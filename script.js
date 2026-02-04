@@ -266,3 +266,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+// --- LÓGICA VISUAL: MODO NOCHE (AISLADA) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('darkModeToggle');
+    // Revisar preferencia guardada
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        toggleBtn.textContent = '☀️'; // Icono de sol para volver a claro
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+
+            // Guardar preferencia
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            // Cambiar icono
+            toggleBtn.textContent = isDark ? '☀️' : '🌙';
+        });
+    }
+});
